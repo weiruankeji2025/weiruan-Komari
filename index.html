@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komarl Probe - 科技探针主题</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- 动态背景 -->
+    <div class="background-container">
+        <div class="cyber-grid"></div>
+        <div class="particles" id="particles"></div>
+        <div class="custom-background" id="customBg"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="assets/images/logo.png" alt="Logo" class="logo" id="siteLogo" onerror="this.style.display='none'">
+                <h1 class="site-title" id="siteTitle">Komarl Probe</h1>
+            </div>
+            <div class="header-right">
+                <div class="time-display" id="currentTime"></div>
+                <button class="settings-btn" onclick="openSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 服务器信息概览 -->
+        <section class="server-overview">
+            <div class="server-card glass-card">
+                <div class="server-info">
+                    <div class="server-status online" id="serverStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">在线</span>
+                    </div>
+                    <h2 class="server-name" id="serverName">主服务器</h2>
+                    <p class="server-location" id="serverLocation">
+                        <i class="fas fa-map-marker-alt"></i> 中国 - 上海
+                    </p>
+                </div>
+                <div class="uptime-info">
+                    <div class="uptime-label">运行时间</div>
+                    <div class="uptime-value" id="uptimeValue">00:00:00:00</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心指标仪表盘 -->
+        <section class="metrics-dashboard">
+            <!-- CPU 使用率 -->
+            <div class="metric-card glass-card cpu-card">
+                <div class="card-header">
+                    <div class="card-icon cpu-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <h3>CPU</h3>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge-3d">
+                        <svg viewBox="0 0 200 200" class="gauge-svg">
+                            <defs>
+                                <linearGradient id="cpuGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#00f5ff"/>
+                                    <stop offset="50%" style="stop-color:#00d4aa"/>
+                                    <stop offset="100%" style="stop-color:#ff6b6b"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="gauge-bg" cx="100" cy="100" r="85"/>
+                            <circle class="gauge-progress cpu-progress" cx="100" cy="100" r="85" id="cpuGauge"/>
+                            <text x="100" y="100" class="gauge-value" id="cpuValue">0%</text>
+                            <text x="100" y="125" class="gauge-label">使用率</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">核心数</span>
+                        <span class="detail-value" id="cpuCores">8</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">型号</span>
+                        <span class="detail-value" id="cpuModel">Intel Xeon</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内存使用率 -->
+            <div class="metric-card glass-card memory-card">
+                <div class="card-header">
+                    <div class="card-icon memory-icon">
+                        <i class="fas fa-memory"></i>
+                    </div>
+                    <h3>内存</h3>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge-3d">
+                        <svg viewBox="0 0 200 200" class="gauge-svg">
+                            <defs>
+                                <linearGradient id="memoryGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#a855f7"/>
+                                    <stop offset="100%" style="stop-color:#ec4899"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="gauge-bg" cx="100" cy="100" r="85"/>
+                            <circle class="gauge-progress memory-progress" cx="100" cy="100" r="85" id="memoryGauge"/>
+                            <text x="100" y="100" class="gauge-value" id="memoryValue">0%</text>
+                            <text x="100" y="125" class="gauge-label">使用率</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">已用</span>
+                        <span class="detail-value" id="memoryUsed">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">总量</span>
+                        <span class="detail-value" id="memoryTotal">16 GB</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 磁盘使用率 -->
+            <div class="metric-card glass-card disk-card">
+                <div class="card-header">
+                    <div class="card-icon disk-icon">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <h3>磁盘</h3>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge-3d">
+                        <svg viewBox="0 0 200 200" class="gauge-svg">
+                            <defs>
+                                <linearGradient id="diskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#f59e0b"/>
+                                    <stop offset="100%" style="stop-color:#ef4444"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="gauge-bg" cx="100" cy="100" r="85"/>
+                            <circle class="gauge-progress disk-progress" cx="100" cy="100" r="85" id="diskGauge"/>
+                            <text x="100" y="100" class="gauge-value" id="diskValue">0%</text>
+                            <text x="100" y="125" class="gauge-label">使用率</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">已用</span>
+                        <span class="detail-value" id="diskUsed">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">总量</span>
+                        <span class="detail-value" id="diskTotal">500 GB</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 网络状态 -->
+            <div class="metric-card glass-card network-card">
+                <div class="card-header">
+                    <div class="card-icon network-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>网络</h3>
+                </div>
+                <div class="network-stats">
+                    <div class="network-stat upload">
+                        <i class="fas fa-arrow-up"></i>
+                        <div class="stat-info">
+                            <span class="stat-label">上传</span>
+                            <span class="stat-value" id="uploadSpeed">0 KB/s</span>
+                        </div>
+                    </div>
+                    <div class="network-stat download">
+                        <i class="fas fa-arrow-down"></i>
+                        <div class="stat-info">
+                            <span class="stat-label">下载</span>
+                            <span class="stat-value" id="downloadSpeed">0 KB/s</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">总上传</span>
+                        <span class="detail-value" id="totalUpload">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">总下载</span>
+                        <span class="detail-value" id="totalDownload">0 GB</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ping 监控图表 -->
+        <section class="charts-section">
+            <div class="chart-card glass-card">
+                <div class="card-header">
+                    <div class="card-icon ping-icon">
+                        <i class="fas fa-signal"></i>
+                    </div>
+                    <h3>网络延迟监控</h3>
+                    <div class="ping-current">
+                        <span class="ping-value" id="currentPing">0</span>
+                        <span class="ping-unit">ms</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pingChart"></canvas>
+                </div>
+                <div class="ping-stats">
+                    <div class="ping-stat">
+                        <span class="ping-stat-label">最小</span>
+                        <span class="ping-stat-value" id="pingMin">0 ms</span>
+                    </div>
+                    <div class="ping-stat">
+                        <span class="ping-stat-label">平均</span>
+                        <span class="ping-stat-value" id="pingAvg">0 ms</span>
+                    </div>
+                    <div class="ping-stat">
+                        <span class="ping-stat-label">最大</span>
+                        <span class="ping-stat-value" id="pingMax">0 ms</span>
+                    </div>
+                    <div class="ping-stat">
+                        <span class="ping-stat-label">丢包率</span>
+                        <span class="ping-stat-value" id="packetLoss">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资源使用历史 -->
+            <div class="chart-card glass-card">
+                <div class="card-header">
+                    <div class="card-icon history-icon">
+                        <i class="fas fa-chart-area"></i>
+                    </div>
+                    <h3>资源使用历史</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="resourceChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color cpu-color"></span>
+                        <span>CPU</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color memory-color"></span>
+                        <span>内存</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color disk-color"></span>
+                        <span>磁盘</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 剩余价值面板 -->
+        <section class="value-section">
+            <div class="value-card glass-card">
+                <div class="card-header">
+                    <div class="card-icon value-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3>剩余价值</h3>
+                </div>
+                <div class="value-content">
+                    <div class="value-main">
+                        <div class="value-item">
+                            <div class="value-label">到期时间</div>
+                            <div class="value-data" id="expireDate">2026-12-31</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-label">剩余天数</div>
+                            <div class="value-data highlight" id="remainingDays">336 天</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-label">购买价格</div>
+                            <div class="value-data" id="purchasePrice">¥ 1,999</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-label">剩余价值</div>
+                            <div class="value-data highlight" id="remainingValue">¥ 1,836</div>
+                        </div>
+                    </div>
+                    <div class="value-progress">
+                        <div class="progress-label">
+                            <span>服务周期</span>
+                            <span id="cycleProgress">92%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="cycleFill" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div class="value-details">
+                        <div class="detail-row">
+                            <span class="detail-label">服务商</span>
+                            <span class="detail-value" id="provider">云服务提供商</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">套餐类型</span>
+                            <span class="detail-value" id="planType">高性能云服务器</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">购买日期</span>
+                            <span class="detail-value" id="purchaseDate">2026-01-01</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">计费周期</span>
+                            <span class="detail-value" id="billingCycle">年付</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 系统信息 -->
+        <section class="system-section">
+            <div class="system-card glass-card">
+                <div class="card-header">
+                    <div class="card-icon system-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3>系统信息</h3>
+                </div>
+                <div class="system-info-grid">
+                    <div class="info-item">
+                        <i class="fas fa-desktop"></i>
+                        <span class="info-label">操作系统</span>
+                        <span class="info-value" id="osInfo">Ubuntu 22.04 LTS</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-code-branch"></i>
+                        <span class="info-label">内核版本</span>
+                        <span class="info-value" id="kernelVersion">5.15.0-91-generic</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-ethernet"></i>
+                        <span class="info-label">IP地址</span>
+                        <span class="info-value" id="ipAddress">192.168.1.100</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span class="info-label">虚拟化</span>
+                        <span class="info-value" id="virtualization">KVM</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span class="info-label">架构</span>
+                        <span class="info-value" id="architecture">x86_64</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span class="info-label">系统时间</span>
+                        <span class="info-value" id="systemTime">2026-01-29 12:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>Powered by <a href="#">Komarl Probe</a> |
+               <span id="footerText">科技探针主题</span>
+            </p>
+            <p class="copyright" id="copyrightText">© 2026 All Rights Reserved</p>
+        </footer>
+    </div>
+
+    <!-- 设置面板 -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-panel glass-card">
+            <div class="settings-header">
+                <h2><i class="fas fa-cog"></i> 主题设置</h2>
+                <button class="close-btn" onclick="closeSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="settings-content">
+                <!-- 基础设置 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-palette"></i> 外观设置</h3>
+                    <div class="setting-item">
+                        <label>站点标题</label>
+                        <input type="text" id="settingSiteTitle" placeholder="Komarl Probe">
+                    </div>
+                    <div class="setting-item">
+                        <label>Logo URL</label>
+                        <input type="text" id="settingLogoUrl" placeholder="assets/images/logo.png">
+                    </div>
+                    <div class="setting-item">
+                        <label>背景图片 URL</label>
+                        <input type="text" id="settingBgUrl" placeholder="留空使用默认背景">
+                    </div>
+                    <div class="setting-item">
+                        <label>主题色</label>
+                        <input type="color" id="settingThemeColor" value="#00f5ff">
+                    </div>
+                    <div class="setting-item">
+                        <label>背景透明度</label>
+                        <input type="range" id="settingBgOpacity" min="0" max="100" value="80">
+                        <span id="opacityValue">80%</span>
+                    </div>
+                </div>
+
+                <!-- 剩余价值设置 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-coins"></i> 剩余价值设置</h3>
+                    <div class="setting-item">
+                        <label>购买日期</label>
+                        <input type="date" id="settingPurchaseDate">
+                    </div>
+                    <div class="setting-item">
+                        <label>到期日期</label>
+                        <input type="date" id="settingExpireDate">
+                    </div>
+                    <div class="setting-item">
+                        <label>购买价格 (元)</label>
+                        <input type="number" id="settingPurchasePrice" placeholder="1999">
+                    </div>
+                    <div class="setting-item">
+                        <label>服务商名称</label>
+                        <input type="text" id="settingProvider" placeholder="云服务提供商">
+                    </div>
+                    <div class="setting-item">
+                        <label>套餐类型</label>
+                        <input type="text" id="settingPlanType" placeholder="高性能云服务器">
+                    </div>
+                    <div class="setting-item">
+                        <label>计费周期</label>
+                        <select id="settingBillingCycle">
+                            <option value="月付">月付</option>
+                            <option value="季付">季付</option>
+                            <option value="半年付">半年付</option>
+                            <option value="年付" selected>年付</option>
+                            <option value="两年付">两年付</option>
+                            <option value="三年付">三年付</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 服务器设置 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-server"></i> 服务器设置</h3>
+                    <div class="setting-item">
+                        <label>服务器名称</label>
+                        <input type="text" id="settingServerName" placeholder="主服务器">
+                    </div>
+                    <div class="setting-item">
+                        <label>服务器位置</label>
+                        <input type="text" id="settingServerLocation" placeholder="中国 - 上海">
+                    </div>
+                </div>
+
+                <!-- API设置 -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-plug"></i> API设置</h3>
+                    <div class="setting-item">
+                        <label>数据API地址</label>
+                        <input type="text" id="settingApiUrl" placeholder="留空使用模拟数据">
+                    </div>
+                    <div class="setting-item">
+                        <label>刷新间隔 (秒)</label>
+                        <input type="number" id="settingRefreshInterval" value="3" min="1" max="60">
+                    </div>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="btn btn-secondary" onclick="resetSettings()">
+                    <i class="fas fa-undo"></i> 重置默认
+                </button>
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> 保存设置
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="config/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
